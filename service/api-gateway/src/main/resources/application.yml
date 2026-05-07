@@ -1,0 +1,9 @@
+server:
+  port: 8000
+spring:
+  application:
+    name: snack24-api-gateway
+  cloud:
+    gateway:
+      # Week 4에서 라우트 정식 등록. 지금은 실행만 되도록 빈 설정.
+      routes: []

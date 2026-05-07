@@ -1,0 +1,20 @@
+server:
+  port: 8001
+spring:
+  application:
+    name: snack24-identity
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://127.0.0.1:3306/snack24_identity
+    username: root
+    password: root
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate          # 스키마는 Flyway가 책임. 엔티티 불일치 시 부팅 실패로 빠른 검출
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    enabled: true
+    baseline-on-migrate: true

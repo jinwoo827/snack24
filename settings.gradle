@@ -1,0 +1,15 @@
+rootProject.name = 'snack24'
+
+include 'common'
+include 'common:snowflake'
+include 'common:event'
+include 'common:data-serializer'
+include 'common:outbox-relay'
+
+include 'service'
+include 'service:identity'
+include 'service:catalog'
+include 'service:order'
+include 'service:billing'
+include 'service:notification-worker'
+include 'service:api-gateway'

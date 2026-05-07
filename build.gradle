@@ -1,0 +1,61 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.5' apply false
+    id 'io.spring.dependency-management' version '1.1.6'
+}
+
+allprojects {
+    group = 'com.snack24'
+    version = '0.0.1-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+        }
+    }
+
+    dependencies {
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+        testCompileOnly 'org.projectlombok:lombok'
+        testAnnotationProcessor 'org.projectlombok:lombok'
+
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+}
+
+// 컨테이너 모듈(루트, :common, :service)은 main class 없음 → Boot 플러그인 적용 X
+// common/* 라이브러리: Boot 플러그인 미적용, 일반 jar (Boot starter 의존성 없으므로 slf4j-api 별도 명시)
+// service/* 애플리케이션: Boot 플러그인 적용, app.jar 통일
+configure(subprojects.findAll { it.parent?.name == 'common' }) {
+    dependencies {
+        implementation 'org.slf4j:slf4j-api'
+    }
+}
+
+configure(subprojects.findAll { it.parent?.name == 'service' }) {
+    apply plugin: 'org.springframework.boot'
+
+    tasks.named('bootJar') {
+        archiveFileName = 'app.jar'
+    }
+}
