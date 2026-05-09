@@ -108,8 +108,12 @@ snack24/
 ## ADR 인덱스
 
 - [0001 — MSA vs 모듈러 모놀리스](docs/adr/0001-msa-vs-modular-monolith.md)
-- 0002 — Saga: Choreography vs Orchestration *(Week 3)*
+- [0002 — 분산 트랜잭션: Saga (Orchestration)](docs/adr/0002-saga-orchestration.md)
 - 0003 — GraphQL BFF의 범위 결정 *(Week 5)*
+
+## 도메인 모델 / 흐름 문서
+
+- [Saga: 주문 흐름](docs/saga-order-flow.md)
 
 ## 참고 / 출처
 

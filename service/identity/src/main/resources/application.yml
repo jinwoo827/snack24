@@ -7,7 +7,7 @@ spring:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://127.0.0.1:3306/snack24_identity
     username: root
-    password: root
+    password: jinwoo
   jpa:
     open-in-view: false
     hibernate:
