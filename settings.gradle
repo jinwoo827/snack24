@@ -5,6 +5,7 @@ include 'common:snowflake'
 include 'common:event'
 include 'common:data-serializer'
 include 'common:outbox-relay'
+include 'common:base-jpa'
 
 include 'service'
 include 'service:identity'

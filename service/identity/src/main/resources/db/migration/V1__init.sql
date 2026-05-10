@@ -24,7 +24,7 @@ create table departments (
                              path varchar(500) null,
                              display_order int not null default 0,
                              created_at datetime(6) not null,
-                             update_at datetime(6) not null,
+                             updated_at datetime(6) not null,
 
                              primary key (department_id),
                              key idx_departments_company_id_parent_department_id_display_order (company_id, parent_department_id, display_order),
@@ -47,8 +47,9 @@ create table members
     role varchar(50) not null default 'ROLE_MEMBER',
     status varchar(50) not null default 'ACTIVE',
     joined_at datetime(6) not null,
+    last_login_at datetime(6) not,
     created_at datetime(6) not null,
-    update_at datetime(6) not null,
+    updated_at datetime(6) not null,
 
     primary key(member_id),
     unique key uk_members_email (email),
