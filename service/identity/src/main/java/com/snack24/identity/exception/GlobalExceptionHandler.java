@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse("INTERNAL_ERROR", "internal server error"));
     }
 
-    public record ErrorResponse(
+    public static record ErrorResponse(
             String code, String message
     ) {
 
