@@ -18,3 +18,13 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+snack24:
+  jwt:
+    issuer: snack24-identity
+    secret: ${SNACK24_JWT_SECRET:dGVzdC1zZWNyZXQtZm9yLWxvY2FsLW9ubHktMzItYnl0ZS1taW4=}
+    access-token-validity: PT30M # 30분
+    refresh-token-validity: P14D # 14일

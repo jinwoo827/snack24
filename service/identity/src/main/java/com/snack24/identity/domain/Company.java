@@ -45,6 +45,7 @@ public class Company extends BaseEntity {
         c.name = name;
         c.businessNo = businessNo;
         c.plan = plan;
+        c.status = CompanyStatus.ACTIVE;
         c.joinedAt = joinedAt;
         return c;
     }
