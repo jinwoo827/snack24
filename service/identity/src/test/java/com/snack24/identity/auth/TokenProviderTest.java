@@ -44,10 +44,15 @@ class TokenProviderTest {
         log.info("token = {}", token);
         AccessTokenClaims claims = provider.parseAccessToken(token);
 
+        String token2 = provider.issueAccessToken(memberId, companyId, role);
+        log.info("token2 = {}", token2);
+
         // then
         assertThat(claims.memberId()).isEqualTo(memberId);
         assertThat(claims.companyId()).isEqualTo(companyId);
         assertThat(claims.role()).isEqualTo(role);
+
+
     }
 
     @Test

@@ -16,6 +16,7 @@ import java.sql.Date;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -36,6 +37,7 @@ public class TokenProvider {
         Instant exp = now.plus(props.accessTokenValidity());
 
         return Jwts.builder()
+                .id(UUID.randomUUID().toString())
                 .issuer(props.issuer())
                 .subject(String.valueOf(memberId))
                 .claim("companyId", companyId)

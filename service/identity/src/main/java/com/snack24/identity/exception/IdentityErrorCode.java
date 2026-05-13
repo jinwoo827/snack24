@@ -15,7 +15,8 @@ public enum IdentityErrorCode implements ErrorCode {
     DEPARTMENT_COMPANY_MISMATCH("IDENTITY_DEPARTMENT_COMPANY_MISMATCH", HttpStatus.BAD_REQUEST, "부서가 해당 회사 소속이 아닙니다."),
     MEMBER_NOT_FOUND("IDENTITY_MEMBER_NOT_FOUND", HttpStatus.NOT_FOUND, "직원을 찾을 수 없습니다."),
     INVALID_CREDENTIALS("IDENTITY_INVALID_CREDENTIALS", HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 올바르지 않습니다."),
-    BUSINESS_NO_DUPLICATED("IDENTITY_BUSINESS_NO_DUPLICATED", HttpStatus.BAD_REQUEST, "사업자번호가 이미 존재합니다.")
+    BUSINESS_NO_DUPLICATED("IDENTITY_BUSINESS_NO_DUPLICATED", HttpStatus.BAD_REQUEST, "사업자번호가 이미 존재합니다."),
+    INVALID_REFRESH_TOKEN("AUTH_INVALID_REFRESH_TOKEN", HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다."),
     ;
 
     private final String code;
