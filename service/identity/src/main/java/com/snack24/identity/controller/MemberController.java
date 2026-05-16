@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,36 +29,34 @@ public class MemberController {
     private final MemberRepository memberRepository;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ROLE_COMPANY_ADMIN')")
     public ResponseEntity<MemberResponse> register(
-            @RequestBody @Valid MemberRegisterRequest request
+            @RequestBody @Valid MemberRegisterRequest request,
+            @AuthenticationPrincipal MemberPrincipal me
     ) {
-        MemberResponse response = memberService.register(request);
+        MemberRegisterRequest tenantSafe = request.withCompanyId(me.companyId());
+        MemberResponse response = memberService.register(tenantSafe);
         URI location = URI.create("/v1/members/" + response.memberId());
         return ResponseEntity.created(location).body(response);
-    }
-
-    @GetMapping("/{memberId}")
-    public MemberResponse get(@PathVariable Long memberId,
-                              @AuthenticationPrincipal MemberPrincipal memberPrincipal
-    ) {
-        MemberResponse memberResponse = memberService.get(memberId);
-        if (!memberResponse.companyId().equals(memberPrincipal.companyId())) {
-            throw new IdentityException(IdentityErrorCode.MEMBER_NOT_FOUND);
-        }
-        return null;
     }
 
     @GetMapping
     public PageResponse<MemberListItem> search(
             @ModelAttribute MemberSearchCondition cond,
-            @PageableDefault(size = 20, sort = "createdAt") Pageable pageable
+            @PageableDefault(size = 20, sort = "createdAt") Pageable pageable,
+            @AuthenticationPrincipal MemberPrincipal me
     ) {
-        return PageResponse.from(memberRepository.searchAdmin(cond, pageable));
+        MemberSearchCondition tenantSafe = cond.withCompanyId(me.companyId());
+        return PageResponse.from(memberRepository.searchAdmin(tenantSafe, pageable));
     }
 
     @GetMapping("/me")
-    public MemberResponse me(@AuthenticationPrincipal MemberPrincipal memberPrincipal) {
-        return memberService.get(memberPrincipal.memberId());
+    public MemberResponse me(@AuthenticationPrincipal MemberPrincipal me) {
+        return memberService.get(me.memberId(), me.companyId());
     }
 
+    @GetMapping("/{memberId}")
+    public MemberResponse get(@PathVariable Long memberId, @AuthenticationPrincipal MemberPrincipal me) {
+        return memberService.get(memberId, me.companyId());
+    }
 }

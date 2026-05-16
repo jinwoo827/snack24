@@ -70,8 +70,9 @@ public class MemberService {
         return MemberResponse.from(member);
     }
 
-    public MemberResponse get(Long memberId) {
+    public MemberResponse get(Long memberId, Long callerCompanyId) {
         Member member = memberRepository.findById(memberId)
+                .filter(m -> m.getCompanyId().equals(callerCompanyId))
                 .orElseThrow(() -> new IdentityException(IdentityErrorCode.MEMBER_NOT_FOUND));
         return MemberResponse.from(member);
     }

@@ -4,12 +4,14 @@ import com.snack24.identity.domain.MemberRole;
 import com.snack24.identity.domain.MemberStatus;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.With;
 
 import java.time.LocalDate;
 
 @Getter
 @Builder
 public class MemberSearchCondition {
+    @With
     private Long companyId;
     private Long departmentId;
     private boolean includeDescendants;
@@ -19,4 +21,5 @@ public class MemberSearchCondition {
     private MemberRole role;
     private LocalDate joinedFrom;
     private LocalDate joinedTo;
+
 }

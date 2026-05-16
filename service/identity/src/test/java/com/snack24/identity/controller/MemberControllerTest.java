@@ -62,7 +62,7 @@ class MemberControllerTest {
     void callApiIfValidTokenTest() throws Exception {
         String token = tokenProvider.issueAccessToken(11L, 1L, MemberRole.ROLE_MEMBER);
         log.info("token = {}", token);
-        BDDMockito.given(memberService.get(11L)).willReturn(null);
+        BDDMockito.given(memberService.get(11L, 1L)).willReturn(null);
         mvc.perform(MockMvcRequestBuilders.get("/v1/members/me").header("Authorization", "Bearer " + token))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
