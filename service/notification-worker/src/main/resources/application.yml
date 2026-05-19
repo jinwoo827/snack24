@@ -3,6 +3,10 @@ server:
 spring:
   application:
     name: snack24-notification-worker
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
   kafka:
     bootstrap-servers: 127.0.0.1:9092
     consumer:
@@ -10,3 +14,6 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       enable-auto-commit: false
+      auto-offset-reset: latest
+    listener:
+      ack-mode: manual
