@@ -1,5 +1,9 @@
 package com.snack24.identity.service;
 
+import com.snack24.common.event.EventType;
+import com.snack24.common.event.payload.CompanyRegisterPayload;
+import com.snack24.common.event.payload.MemberRegisteredPayload;
+import com.snack24.common.outboxrelay.outbox.event.OutboxEventPublisher;
 import com.snack24.common.snowflake.Snowflake;
 import com.snack24.identity.domain.Company;
 import com.snack24.identity.domain.CompanyPlan;
@@ -19,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +33,7 @@ public class CompanyService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final Snowflake snowflake;
+    private final OutboxEventPublisher outboxEventPublisher;
 
     @Transactional
     public CompanyResponse register(CompanyRegisterRequest request) {
@@ -51,29 +55,53 @@ public class CompanyService {
         String email = null;
         CompanyRegisterAdminRequest companyRegisterAdminRequest = request.admin();
 
-        if (companyRegisterAdminRequest != null) {
-            // 이메일 중복 체크
-            if (memberRepository.existsByEmail(companyRegisterAdminRequest.email())) {
-                throw new IdentityException(IdentityErrorCode.EMAIL_DUPLICATED);
-            }
-
-            String hashedPassword = passwordEncoder.encode(companyRegisterAdminRequest.password());
-
-            // member 저장
-            Member member = Member.register(
-                    snowflake.nextId(),
-                    company.getCompanyId(),
-                    null,
-                    companyRegisterAdminRequest.email(),
-                    hashedPassword,
-                    companyRegisterAdminRequest.name(),
-                    companyRegisterAdminRequest.phone(),
-                    MemberRole.ROLE_COMPANY_ADMIN,
-                    LocalDateTime.now()
-            );
-            memberRepository.save(member);
-            email = member.getEmail();
+        // 이메일 중복 체크
+        if (memberRepository.existsByEmail(companyRegisterAdminRequest.email())) {
+            throw new IdentityException(IdentityErrorCode.EMAIL_DUPLICATED);
         }
+
+        String hashedPassword = passwordEncoder.encode(companyRegisterAdminRequest.password());
+
+        // member 저장
+        Member member = Member.register(
+                snowflake.nextId(),
+                company.getCompanyId(),
+                null,
+                companyRegisterAdminRequest.email(),
+                hashedPassword,
+                companyRegisterAdminRequest.name(),
+                companyRegisterAdminRequest.phone(),
+                MemberRole.ROLE_COMPANY_ADMIN,
+                LocalDateTime.now()
+        );
+        memberRepository.save(member);
+        email = member.getEmail();
+
+        outboxEventPublisher.publish(
+                EventType.COMPANY_REGISTERED,
+                CompanyRegisterPayload.builder()
+                        .companyId(company.getCompanyId())
+                        .name(company.getName())
+                        .businessNo(company.getBusinessNo())
+                        .plan(company.getPlan().name())
+                        .joinedAt(company.getJoinedAt())
+                        .registeredAt(company.getCreatedAt())
+                        .build(),
+                company.getCompanyId()
+                );
+
+        outboxEventPublisher.publish(
+                EventType.MEMBER_REGISTERED,
+                MemberRegisteredPayload.builder()
+                        .memberId(member.getMemberId())
+                        .companyId(member.getCompanyId())
+                        .departmentId(null)
+                        .email(member.getEmail())
+                        .name(member.getName())
+                        .registeredAt(member.getCreatedAt())
+                        .build(),
+                member.getMemberId()
+        );
 
         return CompanyResponse.from(company, email);
     }

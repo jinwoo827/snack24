@@ -47,7 +47,7 @@ create table members
     role varchar(50) not null default 'ROLE_MEMBER',
     status varchar(50) not null default 'ACTIVE',
     joined_at datetime(6) not null,
-    last_login_at datetime(6) not,
+    last_login_at datetime(6) null,
     created_at datetime(6) not null,
     updated_at datetime(6) not null,
 

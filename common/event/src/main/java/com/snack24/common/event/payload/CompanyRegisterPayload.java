@@ -10,11 +10,11 @@ import java.time.LocalDateTime;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberRegisteredPayload implements EventPayload {
-    private Long memberId;
+public class CompanyRegisterPayload implements EventPayload {
     private Long companyId;
-    private Long departmentId;
-    private String email;
     private String name;
+    private String businessNo;
+    private String plan;
+    private LocalDateTime joinedAt;
     private LocalDateTime registeredAt;
 }

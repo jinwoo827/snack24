@@ -1,6 +1,9 @@
 package com.snack24.identity.service;
 
+import com.snack24.common.event.EventType;
+import com.snack24.common.event.payload.MemberRegisteredPayload;
 import com.snack24.common.jpabase.exception.ErrorCode;
+import com.snack24.common.outboxrelay.outbox.event.OutboxEventPublisher;
 import com.snack24.common.snowflake.Snowflake;
 import com.snack24.identity.domain.Company;
 import com.snack24.identity.domain.Department;
@@ -30,6 +33,7 @@ public class MemberService {
     private final DepartmentRepository departmentRepository;
     private final PasswordEncoder passwordEncoder;
     private final Snowflake snowflake;
+    private final OutboxEventPublisher outboxEventPublisher;
 
     @Transactional
     public MemberResponse register(MemberRegisterRequest request) {
@@ -67,6 +71,20 @@ public class MemberService {
                 LocalDateTime.now()
         );
         memberRepository.save(member);
+
+        outboxEventPublisher.publish(
+                EventType.MEMBER_REGISTERED,
+                MemberRegisteredPayload.builder()
+                        .memberId(member.getMemberId())
+                        .companyId(member.getCompanyId())
+                        .departmentId(member.getDepartmentId())
+                        .email(member.getEmail())
+                        .name(member.getEmail())
+                        .registeredAt(member.getCreatedAt())
+                        .build(),
+                member.getMemberId()
+        );
+
         return MemberResponse.from(member);
     }
 
