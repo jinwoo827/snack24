@@ -66,6 +66,33 @@ services:
                 depends_on:
                         kafka:
                                 condition: service_healthy
+        identity:
+                build:
+                        context: ../../service/identity
+                container_name: snack24-identity
+                environment:
+                        SPRING_PROFILES_ACTIVE: docker
+                        SNACK24_JWT_SECRET: ${SNACK24_JWT_SECRET:-dGVzdC1zZWNyZXQtZm9yLWxvY2FsLW9ubHktMzItYnl0ZS1taW4=}
+                ports:
+                        - "8001:8001"
+                depends_on:
+                        mariadb: { condition: service_healthy }
+                        redis: { condition: service_healthy }
+                        kafka: { condition: service_healthy }
+                networks: [ default ]
 
+        notification-worker:
+                build:
+                        context: ../../service/notification-worker
+                container_name: snack24-notification-worker
+                environment:
+                        SPRING_PROFILES_ACTIVE: docker
+                ports:
+                        - "8005:8005"
+                depends_on:
+                        redis: { condition: service_healthy }
+                        kafka: { condition: service_healthy }
+                        identity: { condition: service_started }
+                networks: [ default ]
 volumes:
         mariadb-data:
