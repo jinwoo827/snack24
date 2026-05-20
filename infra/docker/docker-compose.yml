@@ -94,5 +94,16 @@ services:
 #                        kafka: { condition: service_healthy }
 #                        identity: { condition: service_started }
 #                networks: [ default ]
+#        catalog:
+#                build:
+#                        context: ../../service/catalog
+#                container_name: snack24-catalog
+#                environment:
+#                        SPRING_PROFILES_ACTIVE: docker
+#                ports:
+#                        - "8002:8002"
+#                depends_on:
+#                        mariadb: { condition: service_healthy }
+#                networks: [ default ]
 volumes:
         mariadb-data:
