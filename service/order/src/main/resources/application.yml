@@ -8,6 +8,10 @@ spring:
     url: jdbc:mariadb://127.0.0.1:3306/snack24_order
     username: root
     password: jinwoo
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
   jpa:
     open-in-view: false
     hibernate:
@@ -15,11 +19,34 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        use_sql_comments: true
+    show-sql: true
   flyway:
-    enabled: true
-    baseline-on-migrate: true
+    enabled: off
+    baseline-on-migrate: off
   kafka:
     bootstrap-servers: 127.0.0.1:9092
+    consumer:
+      group-id: snack24-order
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      enable-auto-commit: false
+      auto-offset-reset: latest
+    listener:
+      ack-mode: manual
+    producer:
+      acks: all
+      properties:
+        enable.idempotence: true
 logging:
   level:
     com.snack24.order: debug
+    org.hibernate.orm.jdbc.bind: trace
+    org.hibernate.type.descriptor.sql: trace
+snack24:
+  client:
+    catalog:
+      base-url: http://127.0.0.1:8002
+      connect-timeout: 1s
+      read-timeout: 2s
+

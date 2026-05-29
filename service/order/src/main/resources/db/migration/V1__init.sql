@@ -5,7 +5,7 @@ create table orders(
                        status      varchar(20) not null default 'PENDING',
                        total_amount    decimal(12,2) not null,
                        ordered_at  datetime(6) not null,
-                       confirmed_at    datetime(6) not null,
+                       confirmed_at    datetime(6) null,
                        canceled_at datetime(6) null,
                        cancel_reason varchar(200) null,
                        created_at datetime(6) not null,

@@ -54,7 +54,7 @@ public class MessageRelay {
     }
 
     @Scheduled(
-            fixedDelay = 10,
+            fixedDelay = 60,
             initialDelay = 5,
             timeUnit = TimeUnit.SECONDS,
             scheduler = "messageRelayPublishPendingEventExecutor"

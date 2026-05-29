@@ -9,6 +9,8 @@ import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -45,15 +47,24 @@ public class Order extends BaseEntity {
     @Column(name = "cancel_reason", length = 100)
     private String cancelReason;
 
-    public static Order place(Long orderId, Long companyId, Long memberId, BigDecimal totalAmount) {
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> items = new ArrayList<>();
+
+    public static Order create(Long orderId, Long companyId, Long memberId) {
         Order o = new Order();
         o.orderId = orderId;
         o.companyId = companyId;
         o.memberId = memberId;
         o.status = OrderStatus.PENDING;
-        o.totalAmount = totalAmount;
+        o.totalAmount = BigDecimal.ZERO;
         o.orderedAt = LocalDateTime.now();
         return o;
+    }
+
+    public void addItems(OrderItem item) {
+        items.add(item);
+        item.assignOrder(this);
+        this.totalAmount = this.totalAmount.add(item.getLineTotal());
     }
 
     public void confirm() {

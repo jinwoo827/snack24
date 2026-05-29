@@ -15,6 +15,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        use_sql_comments: true
+    show-sql: true
   flyway:
     enabled: true
     baseline-on-migrate: true
@@ -46,4 +48,5 @@ snack24:
 logging:
   level:
     com.snack24.identity: debug
-
+    org.hibernate.orm.jdbc.bind: trace
+    org.hibernate.type.descriptor.sql: trace

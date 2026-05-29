@@ -5,14 +5,12 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class OrderTest {
 
     @Test
     void OrderTest() {
         // given
-        Order order = Order.place(1L, 1L, 1L, BigDecimal.valueOf(1000L));
+        Order order = Order.create(1L, 1L, 1L, BigDecimal.valueOf(1000L));
 
         // when
         order.confirm();

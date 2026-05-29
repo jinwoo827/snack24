@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusiness(BusinessException e) {
         ErrorCode errorCode = e.getErrorCode();
-        log.error("[BusinessException] code = {}, message = {}", errorCode.getCode(), errorCode.getDefaultMessage());
+        log.error("[BusinessException] code = {}, message = {}", errorCode.getCode(), errorCode.getDefaultMessage(), e);
         return ResponseEntity.status(errorCode.getStatus())
                 .body(new ErrorResponse(errorCode.getCode(), errorCode.getDefaultMessage()));
     }
@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
         String msg = e.getBindingResult().getAllErrors().stream()
                 .map(err -> err.getDefaultMessage())
                 .collect(Collectors.joining(", "));
-        log.error("[MethodArgumentNotValidException] message = {}", msg);
+        log.error("[MethodArgumentNotValidException] message = {}", msg, e);
         return ResponseEntity.badRequest().body(new ErrorResponse("VALIDATION_FAILED", msg));
     }
 
@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({AccessDeniedException.class, AuthorizationDeniedException.class})
     public ResponseEntity<ErrorResponse> handleAccessDenied(Exception e) {
-        log.warn("[AccessDenied] {}", e.getMessage());
+        log.warn("[AccessDenied] {}", e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new ErrorResponse("AUTH_FORBIDDEN", "권한이 없습니다."));
     }

@@ -1,7 +1,6 @@
 package com.snack24.common.event;
 
-import com.snack24.common.event.payload.CompanyRegisterPayload;
-import com.snack24.common.event.payload.MemberRegisteredPayload;
+import com.snack24.common.event.payload.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +10,25 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public enum EventType {
 
+    // identity
     MEMBER_REGISTERED(MemberRegisteredPayload.class, Topic.IDENTITY),
     COMPANY_REGISTERED(CompanyRegisterPayload.class, Topic.IDENTITY),
+
+    // Saga 명령 (order -> catalog / billing)
+    RESERVE_STOCK_COMMAND(ReserveStockCommandPayload.class, Topic.CATALOG),
+    RELEASE_STOCK_COMMAND(ReleaseStockCommandPayload.class, Topic.CATALOG),
+    DEBIT_WALLET_COMMAND(DebitWalletCommandPayload.class, Topic.BILLING),
+
+    // Saga 응답 이벤트 (catalog / billing -> order)
+    STOCK_RESERVED(StockReservedPayload.class, Topic.CATALOG),
+    STOCK_RESERVATION_FAILED(StockReservationFailedPayload.class, Topic.CATALOG),
+    STOCK_RELEASED(StockReleasedPayload.class, Topic.CATALOG),
+    WALLET_DEBITED(WalletDebitedPayload.class, Topic.BILLING),
+    WALLET_DEBIT_FAILED(WalletDebitFailedPayload.class, Topic.BILLING),
+
+    // order -> notification
+    ORDER_CONFIRMED(OrderConfirmedPayload.class, Topic.ORDER),
+    ORDER_CANCELED(OrderCanceledPayload.class, Topic.ORDER),
 
     ;
 
