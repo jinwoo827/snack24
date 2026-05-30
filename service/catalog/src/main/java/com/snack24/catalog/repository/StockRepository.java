@@ -21,5 +21,4 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
     @Query("select s from Stock s where s.productId in :productIds")
     List<Stock> findAllByProductIdInForUpdate(@Param("productIds") List<Long> productIds);
 
-    findStocksByOr
 }
