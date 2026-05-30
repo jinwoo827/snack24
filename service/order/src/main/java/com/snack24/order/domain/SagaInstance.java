@@ -85,7 +85,9 @@ public class SagaInstance extends BaseEntity {
     }
 
     public void markCancel() {
-        ensure(SagaStatus.COMPENSATING);
+        if (!(status == SagaStatus.COMPENSATING || status == SagaStatus.STARTED)) {
+            throw new IllegalStateException("주문 취소가 불가능합니다.");
+        }
         this.status = SagaStatus.CANCELED;
         advance();
     }

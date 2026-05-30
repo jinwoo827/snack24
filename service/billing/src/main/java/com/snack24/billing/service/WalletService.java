@@ -8,6 +8,7 @@ import com.snack24.billing.pay.PaymentGateway;
 import com.snack24.billing.pay.PaymentResult;
 import com.snack24.billing.repository.WalletRepository;
 import com.snack24.billing.repository.WalletTransactionRepository;
+import com.snack24.billing.service.response.WalletChargeResponse;
 import com.snack24.common.snowflake.Snowflake;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,7 @@ public class WalletService {
     }
 
     @Transactional
-    public void charge(Long companyId, BigDecimal amount, String idempotencyKey) {
+    public WalletChargeResponse charge(Long companyId, BigDecimal amount, String idempotencyKey) {
         Wallet wallet = walletRepository.findByCompanyId(companyId)
                 .orElseThrow(() -> new BillingException(BillingErrorCode.WALLET_NOT_FOUND));
 
@@ -63,6 +64,8 @@ public class WalletService {
                         "PG TX : " + result.pgTransactionId()
                 )
         );
+
+        return WalletChargeResponse.from(wallet);
     }
 
 }

@@ -49,4 +49,12 @@ snack24:
       base-url: http://127.0.0.1:8002
       connect-timeout: 1s
       read-timeout: 2s
-
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+  api-docs:
+    path: /v3/api-docs
+  packages-to-scan: com.snack24.order.controller

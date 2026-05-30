@@ -59,3 +59,12 @@ configure(subprojects.findAll { it.parent?.name == 'service' }) {
         archiveFileName = 'app.jar'
     }
 }
+
+def swaggerServices = ['identity', 'catalog', 'order', 'billing']
+configure(subprojects.findAll {
+    it.parent?.name == 'service' && it.name in swaggerServices
+}) {
+    dependencies {
+        implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+    }
+}

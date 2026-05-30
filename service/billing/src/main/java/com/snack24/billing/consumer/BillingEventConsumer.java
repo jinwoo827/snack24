@@ -4,6 +4,7 @@ import com.snack24.billing.service.WalletCommandHandler;
 import com.snack24.common.event.Event;
 import com.snack24.common.event.EventPayload;
 import com.snack24.common.event.EventType;
+import com.snack24.common.event.payload.CompanyRegisterPayload;
 import com.snack24.common.event.payload.DebitWalletCommandPayload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ public class BillingEventConsumer {
 
         switch (event.getType()) {
             case EventType.DEBIT_WALLET_COMMAND -> walletCommandHandler.handleDebit((DebitWalletCommandPayload) event.getPayload());
+            case EventType.COMPANY_REGISTERED -> walletCommandHandler.handleCreateWallet((CompanyRegisterPayload) event.getPayload());
             default -> {}
         }
 

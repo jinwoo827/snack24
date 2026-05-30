@@ -7,6 +7,7 @@ import com.snack24.billing.exception.BillingException;
 import com.snack24.billing.repository.WalletRepository;
 import com.snack24.billing.repository.WalletTransactionRepository;
 import com.snack24.common.event.EventType;
+import com.snack24.common.event.payload.CompanyRegisterPayload;
 import com.snack24.common.event.payload.DebitWalletCommandPayload;
 import com.snack24.common.event.payload.WalletDebitFailedPayload;
 import com.snack24.common.event.payload.WalletDebitedPayload;
@@ -68,6 +69,16 @@ public class WalletCommandHandler {
 
     }
 
+    @Transactional
+    public void handleCreateWallet(CompanyRegisterPayload payload) {
+        if (walletRepository.findByCompanyId(payload.getCompanyId())
+                .isEmpty()) {
+            walletRepository.save(
+                    Wallet.openFor(snowflake.nextId(), payload.getCompanyId())
+            );
+        }
+    }
+
     private void publishDebited(DebitWalletCommandPayload payload) {
         outboxEventPublisher.publish(
                 EventType.WALLET_DEBITED,
@@ -92,4 +103,5 @@ public class WalletCommandHandler {
                 payload.getSagaId()
         );
     }
+
 }
