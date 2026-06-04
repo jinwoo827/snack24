@@ -5,5 +5,48 @@ spring:
     name: snack24-api-gateway
   cloud:
     gateway:
-      # Week 4에서 라우트 정식 등록. 지금은 실행만 되도록 빈 설정.
-      routes: []
+      routes:
+        - id: identity-auth
+          uri: http://127.0.0.1:8001
+          predicates:
+            - Path=/v1/auth/**
+        - id: identity-public-register
+          uri: http://127.0.0.1:8001
+          predicates:
+            - Path=/v1/companies
+            - Method=POST
+        - id: identity-companies
+          uri: http://127.0.0.1:8001
+          predicates:
+            - Path=/v1/companies/**
+        - id: identity-members
+          uri: http://127.0.0.1:8001
+          predicates:
+            - Path=/v1/members/**
+        - id: catalog
+          uri: http://127.0.0.1:8002
+          predicates:
+            - Path=/v1/products/**
+        - id: order
+          uri: http://127.0.0.1:8003
+          predicates:
+            - Path=/v1/orders/**
+        - id: billing
+          uri: http://127.0.0.1:8004
+          predicates:
+            - Path=/v1/wallets/**
+
+snack24:
+  gateway:
+    permit-all-paths:
+      - /v1/auth/**
+      - POST:/v1/companies
+      - /actuator/**
+      - /v3/api-docs/**
+  jwt:
+    issuer: snack24-identity
+    secret: ${SNACK24_JWT_SECRET:dGVzdC1zZWNyZXQtZm9yLWxvY2FsLW9ubHktMzItYnl0ZS1taW4=}
+logging:
+  level:
+    org.springframework.cloud.gateway: debug
+    com.snack24.gateway: debug

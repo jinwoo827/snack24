@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class BillingEventConsumer {
     private final WalletCommandHandler walletCommandHandler;
 
-    @KafkaListener(topics = EventType.Topic.BILLING)
+    @KafkaListener(topics = {EventType.Topic.BILLING, EventType.Topic.IDENTITY})
     public void listen(String message, Acknowledgment ack) {
         Event<EventPayload> event = Event.fromJson(message);
         if (event == null) {
