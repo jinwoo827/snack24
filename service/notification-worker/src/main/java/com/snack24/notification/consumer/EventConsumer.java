@@ -19,7 +19,8 @@ public class EventConsumer {
 
     @KafkaListener(
             topics = {
-                    EventType.Topic.IDENTITY
+                    EventType.Topic.IDENTITY,
+                    EventType.Topic.ORDER
             }
     )
     public void listen(String message, Acknowledgment ack) {
