@@ -1,8 +1,11 @@
 server:
   port: 8005
+  shutdown: graceful
 spring:
   application:
     name: snack24-notification-worker
+  lifecycle:
+    timeout-per-shutdown-phase: 25s
   data:
     redis:
       host: 127.0.0.1
@@ -17,3 +20,18 @@ spring:
       auto-offset-reset: latest
     listener:
       ack-mode: manual
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+      group:
+        readiness:
+          include: db,redis
+        liveness:
+          include: ping

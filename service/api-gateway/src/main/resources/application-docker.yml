@@ -1,0 +1,6 @@
+snack24:
+  routes:
+    identity-uri: http://identity:8001
+    catalog-uri: http://catalog:8002
+    order-uri: http://order:8003
+    billing-uri: http://billing:8004

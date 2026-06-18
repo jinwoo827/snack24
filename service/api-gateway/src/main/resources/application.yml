@@ -1,38 +1,41 @@
 server:
   port: 8000
+  shutdown: graceful
 spring:
   application:
     name: snack24-api-gateway
+  lifecycle:
+    timeout-per-shutdown-phase: 25s
   cloud:
     gateway:
       routes:
         - id: identity-auth
-          uri: http://127.0.0.1:8001
+          uri: ${snack24.routes.identity-uri:http://127.0.0.1:8001}
           predicates:
             - Path=/v1/auth/**
         - id: identity-public-register
-          uri: http://127.0.0.1:8001
+          uri: ${snack24.routes.identity-uri:http://127.0.0.1:8001}
           predicates:
             - Path=/v1/companies
             - Method=POST
         - id: identity-companies
-          uri: http://127.0.0.1:8001
+          uri: ${snack24.routes.identity-uri:http://127.0.0.1:8001}
           predicates:
             - Path=/v1/companies/**
         - id: identity-members
-          uri: http://127.0.0.1:8001
+          uri: ${snack24.routes.identity-uri:http://127.0.0.1:8001}
           predicates:
             - Path=/v1/members/**
         - id: catalog
-          uri: http://127.0.0.1:8002
+          uri: ${snack24.routes.catalog-uri:http://127.0.0.1:8002}
           predicates:
             - Path=/v1/products/**
         - id: order
-          uri: http://127.0.0.1:8003
+          uri: ${snack24.routes.order-uri:http://127.0.0.1:8003}
           predicates:
             - Path=/v1/orders/**
         - id: billing
-          uri: http://127.0.0.1:8004
+          uri: ${snack24.routes.billing-uri:http://127.0.0.1:8004}
           predicates:
             - Path=/v1/wallets/**
 
@@ -50,3 +53,16 @@ logging:
   level:
     org.springframework.cloud.gateway: debug
     com.snack24.gateway: debug
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+      group:
+        liveness:
+          include: ping

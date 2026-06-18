@@ -1,8 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mariadb://mariadb:3306/snack24_catalog
-    username: root
-    password: jinwoo
+    url: jdbc:mariadb://mariadb:3306/snack24_billing
   data:
     redis:
       host: redis

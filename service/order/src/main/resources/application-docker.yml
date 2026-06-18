@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:mariadb://mariadb:3306/snack24_order
+    username: root
+    password: jinwoo
+  data:
+    redis:
+      host: redis
+  kafka:
+    bootstrap-servers: kafka:29092
+snack24:
+  client:
+    catalog:
+      base-url: http://catalog:8002

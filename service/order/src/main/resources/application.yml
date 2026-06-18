@@ -1,8 +1,11 @@
 server:
   port: 8003
+  shutdown: graceful
 spring:
   application:
     name: snack24-order
+  lifecycle:
+    timeout-per-shutdown-phase: 25s
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://127.0.0.1:3306/snack24_order
@@ -22,8 +25,8 @@ spring:
         use_sql_comments: true
     show-sql: true
   flyway:
-    enabled: off
-    baseline-on-migrate: off
+    enabled: true
+    baseline-on-migrate: true
   kafka:
     bootstrap-servers: 127.0.0.1:9092
     consumer:
@@ -46,7 +49,7 @@ logging:
 snack24:
   client:
     catalog:
-      base-url: http://127.0.0.1:8002
+      base-url: ${snack24.client.catalog.base-url:http://127.0.0.1:8002}
       connect-timeout: 1s
       read-timeout: 2s
 springdoc:
@@ -58,3 +61,18 @@ springdoc:
   api-docs:
     path: /v3/api-docs
   packages-to-scan: com.snack24.order.controller
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+      group:
+        readiness:
+          include: db,redis
+        liveness:
+          include: ping

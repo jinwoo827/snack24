@@ -66,44 +66,70 @@ services:
                 depends_on:
                         kafka:
                                 condition: service_healthy
-#        identity:
-#                build:
-#                        context: ../../service/identity
-#                container_name: snack24-identity
-#                environment:
-#                        SPRING_PROFILES_ACTIVE: docker
-#                        SNACK24_JWT_SECRET: ${SNACK24_JWT_SECRET:-dGVzdC1zZWNyZXQtZm9yLWxvY2FsLW9ubHktMzItYnl0ZS1taW4=}
-#                ports:
-#                        - "8001:8001"
-#                depends_on:
-#                        mariadb: { condition: service_healthy }
-#                        redis: { condition: service_healthy }
-#                        kafka: { condition: service_healthy }
-#                networks: [ default ]
-#
-#        notification-worker:
-#                build:
-#                        context: ../../service/notification-worker
-#                container_name: snack24-notification-worker
-#                environment:
-#                        SPRING_PROFILES_ACTIVE: docker
-#                ports:
-#                        - "8005:8005"
-#                depends_on:
-#                        redis: { condition: service_healthy }
-#                        kafka: { condition: service_healthy }
-#                        identity: { condition: service_started }
-#                networks: [ default ]
-#        catalog:
-#                build:
-#                        context: ../../service/catalog
-#                container_name: snack24-catalog
-#                environment:
-#                        SPRING_PROFILES_ACTIVE: docker
-#                ports:
-#                        - "8002:8002"
-#                depends_on:
-#                        mariadb: { condition: service_healthy }
-#                networks: [ default ]
+        # ─────────── 앱 컨테이너 ───────────
+        identity:
+                build: { context: ../../service/identity }
+                container_name: snack24-identity
+                environment:
+                        SPRING_PROFILES_ACTIVE: docker
+                        SNACK24_JWT_SECRET: ${SNACK24_JWT_SECRET:-dGVzdC1zZWNyZXQtZm9yLWxvY2FsLW9ubHktMzItYnl0ZS1taW4=}
+                ports: [ "8001:8001" ]
+                depends_on:
+                        mariadb: { condition: service_healthy }
+                        redis: { condition: service_healthy }
+                        kafka: { condition: service_healthy }
+
+        catalog:
+                build: { context: ../../service/catalog }
+                container_name: snack24-catalog
+                environment: { SPRING_PROFILES_ACTIVE: docker }
+                ports: [ "8002:8002" ]
+                depends_on:
+                        mariadb: { condition: service_healthy }
+                        redis: { condition: service_healthy }
+                        kafka: { condition: service_healthy }
+
+        order:
+                build: { context: ../../service/order }
+                container_name: snack24-order
+                environment: { SPRING_PROFILES_ACTIVE: docker }
+                ports: [ "8003:8003" ]
+                depends_on:
+                        mariadb: { condition: service_healthy }
+                        redis: { condition: service_healthy }
+                        kafka: { condition: service_healthy }
+                        catalog: { condition: service_started }
+
+        billing:
+                build: { context: ../../service/billing }
+                container_name: snack24-billing
+                environment: { SPRING_PROFILES_ACTIVE: docker }
+                ports: [ "8004:8004" ]
+                depends_on:
+                        mariadb: { condition: service_healthy }
+                        redis: { condition: service_healthy }
+                        kafka: { condition: service_healthy }
+
+        notification-worker:
+                build: { context: ../../service/notification-worker }
+                container_name: snack24-notification-worker
+                environment: { SPRING_PROFILES_ACTIVE: docker }
+                ports: [ "8005:8005" ]
+                depends_on:
+                        redis: { condition: service_healthy }
+                        kafka: { condition: service_healthy }
+
+        api-gateway:
+                build: { context: ../../service/api-gateway }
+                container_name: snack24-api-gateway
+                environment:
+                        SPRING_PROFILES_ACTIVE: docker
+                        SNACK24_JWT_SECRET: ${SNACK24_JWT_SECRET:-dGVzdC1zZWNyZXQtZm9yLWxvY2FsLW9ubHktMzItYnl0ZS1taW4=}
+                ports: [ "8000:8000" ]
+                depends_on:
+                        identity: { condition: service_started }
+                        catalog: { condition: service_started }
+                        order: { condition: service_started }
+                        billing: { condition: service_started }
 volumes:
         mariadb-data:

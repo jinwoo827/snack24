@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-init
+data:
+  01-create-databases.sql: |
+    CREATE DATABASE IF NOT EXISTS snack24_identity DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    CREATE DATABASE IF NOT EXISTS snack24_catalog  DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    CREATE DATABASE IF NOT EXISTS snack24_order    DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    CREATE DATABASE IF NOT EXISTS snack24_billing  DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci;
