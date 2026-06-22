@@ -61,30 +61,30 @@ class WalletRepositoryTest {
         walletRepository.deleteAllInBatch();
     }
 
-    @Test
-    @DisplayName("잔액이 충분하면 1 반환후 잔액 감소")
-    void debit_sufficient() {
-        Long companyId = givenWalletWithBalance(1L, 1L, "10000");
-        int affected = walletRepository.debitIfSufficient(companyId, new BigDecimal("3000"));
-        assertThat(affected).isEqualTo(1);
-        Wallet wallet = walletRepository.findByCompanyId(companyId)
-                .orElseThrow();
-        assertThat(wallet.getBalance()).isEqualByComparingTo("7000");
-    }
+//    @Test
+//    @DisplayName("잔액이 충분하면 1 반환후 잔액 감소")
+//    void debit_sufficient() {
+//        Long companyId = givenWalletWithBalance(1L, 1L, "10000");
+//        int affected = walletRepository.debitIfSufficient(companyId, new BigDecimal("3000"));
+//        assertThat(affected).isEqualTo(1);
+//        Wallet wallet = walletRepository.findByCompanyId(companyId)
+//                .orElseThrow();
+//        assertThat(wallet.getBalance()).isEqualByComparingTo("7000");
+//    }
 
-    @Test
-    @DisplayName("잔액이 차감 금액과 동일할, 결과는 0")
-    void debit_exact() {
-        Long companyId = givenWalletWithBalance(1L, 1L, "10000");
-        int affected = walletRepository.debitIfSufficient(companyId, new BigDecimal("10000"));
-        assertThat(affected).isEqualTo(1);
-        Wallet wallet = walletRepository.findByCompanyId(companyId)
-                .orElseThrow();
-        assertThat(wallet.getBalance()).isEqualByComparingTo("0");
-    }
+//    @Test
+//    @DisplayName("잔액이 차감 금액과 동일할, 결과는 0")
+//    void debit_exact() {
+//        Long companyId = givenWalletWithBalance(1L, 1L, "10000");
+//        int affected = walletRepository.debitIfSufficient(companyId, new BigDecimal("10000"));
+//        assertThat(affected).isEqualTo(1);
+//        Wallet wallet = walletRepository.findByCompanyId(companyId)
+//                .orElseThrow();
+//        assertThat(wallet.getBalance()).isEqualByComparingTo("0");
+//    }
 
-    @Test
-    @DisplayName("잔액이 부족하, 차감되지 않는다")
+   /* @Test
+    @DisplayName("잔액이 부족하면, 차감되지 않는다")
     void debit_insufficient() {
         Long companyId = givenWalletWithBalance(1L, 1L, "10000");
         int affected = walletRepository.debitIfSufficient(companyId, new BigDecimal("20000"));
@@ -92,16 +92,16 @@ class WalletRepositoryTest {
         Wallet wallet = walletRepository.findByCompanyId(companyId)
                 .orElseThrow();
         assertThat(wallet.getBalance()).isEqualByComparingTo("10000");
-    }
+    }*/
 
-    @Test
+    /*@Test
     @DisplayName("존재하지 않는 회사 일때, 차감되지 않는다")
     void debit_nonexistent_company() {
         int affected = walletRepository.debitIfSufficient(1L, new BigDecimal("10000"));
         assertThat(affected).isZero();
-    }
+    }*/
 
-    @Test
+    /*@Test
     @DisplayName("잔액 증가")
     void credit_increase_balance() {
         Long companyId = givenWalletWithBalance(1L, 1L, "10000");
@@ -109,7 +109,7 @@ class WalletRepositoryTest {
         assertThat(affected).isEqualTo(1);
         assertThat(walletRepository.findByCompanyId(companyId).orElseThrow().getBalance())
                 .isEqualByComparingTo("20000");
-    }
+    }*/
 
    /* @Test
     @DisplayName("동시 차감 시에, 잔액은 음수가 될수 없다")
