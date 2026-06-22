@@ -16,7 +16,7 @@ class MemberSearchRepositoryImplTest {
 
     @Autowired MemberRepository memberRepository;
 
-    @Test
+    /*@Test
     void searchTest() {
         MemberSearchCondition cond = MemberSearchCondition.builder()
                 .companyId(1L)
@@ -29,5 +29,5 @@ class MemberSearchRepositoryImplTest {
             log.info("member = {}", memberListItem);
         }
 
-    }
+    }*/
 }

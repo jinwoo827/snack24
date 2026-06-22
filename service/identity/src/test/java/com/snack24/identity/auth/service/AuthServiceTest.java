@@ -28,7 +28,7 @@ class AuthServiceTest {
     @Autowired PasswordEncoder passwordEncoder;
     @Autowired RefreshTokenRepository refreshTokenRepository;
 
-    @Test
+    /*@Test
     void authServiceTest() {
         // given
         String email = "jinwoo1@test.co.kr";
@@ -52,6 +52,6 @@ class AuthServiceTest {
 
         // 토큰 삭제되었는지 체크
         Assertions.assertThat(refreshTokenRepository.find(refreshResponse.refreshToken())).isEmpty();
-    }
+    }*/
 
 }

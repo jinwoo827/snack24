@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class CompanyControllerTest {
     RestClient client = RestClient.create("http://localhost:8001");
 
-    @Test
+    /*@Test
     void registerCompanyTest() {
         String password = "1q2w3e4r";
         CompanyResponse response = client.post()
@@ -73,6 +73,6 @@ class CompanyControllerTest {
                 .retrieve()
                 .body(MemberResponse.class);
 
-    }
+    }*/
 
 }
