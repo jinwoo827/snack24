@@ -10,7 +10,7 @@ class OrderTest {
     @Test
     void OrderTest() {
         // given
-        Order order = Order.create(1L, 1L, 1L, BigDecimal.valueOf(1000L));
+        Order order = Order.create(1L, 1L, 1L);
 
         // when
         order.confirm();
