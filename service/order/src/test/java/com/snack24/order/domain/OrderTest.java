@@ -12,7 +12,7 @@ class OrderTest {
         // given
         Order order = Order.create(1L, 1L, 1L);
 
-        // when
+        // when 테스트
         order.confirm();
 
         // then
