@@ -1,6 +1,10 @@
 # build
 
 # APP[catalog, identity, order, billing, notification-worker]
+./gradlew :service:catalog:bootJar
+docker build -t snack24/catalog:latest service/identity
+
+
 ./gradlew :service:identity:bootJar
 docker build -t snack24/identity:v1.0.1 service/identity
 k3d image import snack24/identity:v1.0.1 -c snack24

@@ -1,0 +1,43 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: snack24
+
+resources:
+  - ../../base
+  - hpa-order.yaml
+  - hpa-catalog.yaml
+
+commonLabels:
+  environment: prod
+
+images:
+  - name: snack24/identity
+    newTag: v1.0.0
+  - name: snack24/catalog
+    newTag: v1.0.0
+  - name: snack24/order
+    newTag: v1.0.0
+  - name: snack24/billing
+    newTag: v1.0.0
+
+patches:
+  - path: replicas-patch.yaml
+    target:
+      kind: Deployment
+  - path: resources-patch.yaml
+    target:
+      kind: Deployment
+  - path: imagepull-patch.yaml
+    target:
+      kind: Deployment
+  - path: ingress-patch.yaml
+    target:
+      kind: Ingress
+      name: snack24-gateway
+
+configMapGenerator:
+  - name: app-env
+    literals:
+      - SPRING_PROFILES_ACTIVE=prod
+      - LOG_LEVEL=INFO

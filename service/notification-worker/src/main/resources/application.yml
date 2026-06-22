@@ -32,6 +32,6 @@ management:
       show-details: always
       group:
         readiness:
-          include: db,redis
+          include: redis
         liveness:
           include: ping

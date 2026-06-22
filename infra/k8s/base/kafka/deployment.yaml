@@ -12,6 +12,9 @@ spec:
     spec:
       containers:
         - name: kafka
+          envFrom:
+            - configMapRef:
+                name: app-env
           image: apache/kafka:3.7.0
           ports:
             - containerPort: 9092
@@ -38,7 +41,7 @@ spec:
                 - -c
                 - "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:29092 --list >/dev/null 2>&1"
             initialDelaySeconds: 30
-            periodSeconds: 10
+            periodSeconds: 15
             timeoutSeconds: 10
             failureThreshold: 5
           resources:

@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: snack24
+
+resources:
+  - namespace.yaml
+  - secrets/secrets.yaml
+  - mariadb/statefulset.yaml
+  - mariadb/service.yaml
+  - mariadb/init-configmap.yaml
+  - mariadb/pvc.yaml
+  - redis/deployment.yaml
+  - redis/service.yaml
+  - kafka/deployment.yaml
+  - kafka/service.yaml
+  - apps/identity/deployment.yaml
+  - apps/identity/service.yaml
+  - apps/catalog/deployment.yaml
+  - apps/catalog/service.yaml
+  - apps/order/deployment.yaml
+  - apps/order/service.yaml
+  - apps/billing/deployment.yaml
+  - apps/billing/service.yaml
+  - apps/notification-worker/deployment.yaml
+  - apps/notification-worker/service.yaml
+  - apps/api-gateway/deployment.yaml
+  - apps/api-gateway/service.yaml
+  - ingress/gateway-ingress.yaml
+
+commonLabels:
+  app.kubernetes.io/part-of: snack24

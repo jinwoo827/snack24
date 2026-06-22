@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: catalog
 spec:
-  replicas: 2
+  replicas: 1
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -17,6 +17,9 @@ spec:
     spec:
       containers:
         - name: catalog
+          envFrom:
+            - configMapRef:
+                name: app-env
           image: snack24/catalog:latest
           imagePullPolicy: IfNotPresent          # 로컬 import 이미지 사용
           ports:
@@ -24,7 +27,7 @@ spec:
               containerPort: 8002
           env:
             # Spring profile — application-k8s.yml 사용
-            - { name: SPRING_PROFILES_ACTIVE, value: "k8s" }
+            - { name: SPRING_PROFILES_ACTIVE }
 
             # DB
             - name: SPRING_DATASOURCE_URL
@@ -44,12 +47,15 @@ spec:
               valueFrom:
                 secretKeyRef: { name: snack24-jwt, key: secret }
 
+            - name: JAVA_TOOL_OPTIONS
+              value: "-XX:MaxRAMPercentage=70.0 -XX:InitialRAMPercentage=50.0"
+
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
               port: http
             initialDelaySeconds: 30
-            periodSeconds: 10
+            periodSeconds: 30
             timeoutSeconds: 2
             failureThreshold: 3
           readinessProbe:
@@ -57,7 +63,7 @@ spec:
               path: /actuator/health/readiness
               port: http
             initialDelaySeconds: 10
-            periodSeconds: 5
+            periodSeconds: 15
             timeoutSeconds: 2
             failureThreshold: 3
           startupProbe:
