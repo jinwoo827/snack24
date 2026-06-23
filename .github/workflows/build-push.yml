@@ -65,6 +65,12 @@ jobs:
           name: service-jars
           path: service
 
+      - name: Compute image name (lowercase)
+        id: img
+        run: |
+          OWNER_LC="${GITHUB_REPOSITORY_OWNER,,}"
+          echo "name=ghcr.io/${OWNER_LC}/snack24/${{ matrix.service }}" >> "$GITHUB_OUTPUT"
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
@@ -76,13 +82,26 @@ jobs:
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.img.outputs.name }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=,format=short
+            type=raw,value=latest,enable=${{ github.ref_type == 'tag' }}
+          labels: |
+            org.opencontainers.image.title=snack24-${{ matrix.service }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
 
       - name: Build & Push
         uses: docker/build-push-action@v6
