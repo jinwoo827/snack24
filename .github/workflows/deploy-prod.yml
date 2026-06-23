@@ -1,0 +1,88 @@
+name: Deploy to Prod
+
+on:
+  push:
+    tags: ['v*']                  # v1.0.0 같은 semver 태그
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Image tag to deploy (e.g., v1.0.0)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  bump-prod-images:
+    name: Bump prod image tags
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    environment: prod              # ★ Required reviewers 가 작동 — 사람이 승인해야 진행
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+          ref: main                # tag 가 아닌 main 의 manifest 갱신
+
+      - name: Install kustomize
+        run: |
+          curl -sLo kustomize.tar.gz \
+            https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.4.3/kustomize_v5.4.3_linux_amd64.tar.gz
+          tar -xzf kustomize.tar.gz
+          sudo mv kustomize /usr/local/bin/
+
+      - name: Compute image base (lowercase owner)
+        id: img
+        run: |
+          OWNER_LC="${GITHUB_REPOSITORY_OWNER,,}"
+          echo "registry=ghcr.io/${OWNER_LC}/snack24" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            # refs/tags/v1.0.0 → v1.0.0
+            TAG="${GITHUB_REF##refs/tags/}"
+          else
+            TAG="${{ github.event.inputs.tag }}"
+          fi
+          # docker/metadata-action 은 v1.0.0 을 1.0.0 으로 만듦 (semver pattern)
+          # 우리도 그 형식 사용
+          VERSION="${TAG#v}"
+          echo "tag=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Bump image tags in prod overlay
+        working-directory: infra/k8s/overlays/prod
+        run: |
+          REG="${{ steps.img.outputs.registry }}"
+          TAG="${{ steps.tag.outputs.tag }}"
+
+          for svc in identity catalog order billing api-gateway notification-worker; do
+            kustomize edit set image "snack24/${svc}=${REG}/${svc}:${TAG}"
+          done
+
+          cat kustomization.yaml
+
+      - name: Commit & push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet; then
+            echo "No changes — skipping commit"
+            exit 0
+          fi
+
+          git add infra/k8s/overlays/prod/kustomization.yaml
+          git commit -m "ci(deploy): bump prod images to ${{ steps.tag.outputs.tag }} [skip ci]"
+          git push
+
+      - name: Job summary
+        run: |
+          echo "## Prod Deployment Approved" >> $GITHUB_STEP_SUMMARY
+          echo "- Image tag: \`${{ steps.tag.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Approved by: \`${{ github.actor }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Run \`git pull && kubectl apply -k infra/k8s/overlays/prod\` locally" >> $GITHUB_STEP_SUMMARY

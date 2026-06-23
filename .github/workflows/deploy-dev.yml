@@ -1,0 +1,86 @@
+name: Deploy to Dev
+
+on:
+  workflow_run:
+    workflows: ["Build & Push Images"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bump-dev-images:
+    name: Bump dev image tags
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+
+    environment: dev
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Install kustomize
+        run: |
+          curl -sLo kustomize.tar.gz \
+            https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.4.3/kustomize_v5.4.3_linux_amd64.tar.gz
+          tar -xzf kustomize.tar.gz
+          sudo mv kustomize /usr/local/bin/
+          kustomize version
+
+      - name: Compute image base (lowercase owner)
+        id: img
+        run: |
+          OWNER_LC="${GITHUB_REPOSITORY_OWNER,,}"
+          echo "registry=ghcr.io/${OWNER_LC}/snack24" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve SHA tag
+        id: sha
+        run: |
+          # workflow_run 이벤트면 그 commit, 수동이면 현재 HEAD
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            SHA="${{ github.event.workflow_run.head_sha }}"
+          else
+            SHA="${{ github.sha }}"
+          fi
+          # docker/metadata-action 의 short format 과 동일하게 7자리
+          echo "tag=${SHA:0:7}" >> "$GITHUB_OUTPUT"
+
+      - name: Bump image tags in dev overlay
+        working-directory: infra/k8s/overlays/dev
+        run: |
+          REG="${{ steps.img.outputs.registry }}"
+          TAG="${{ steps.sha.outputs.tag }}"
+
+          for svc in identity catalog order billing api-gateway notification-worker; do
+            kustomize edit set image "snack24/${svc}=${REG}/${svc}:${TAG}"
+          done
+
+          echo "--- updated kustomization.yaml ---"
+          cat kustomization.yaml
+
+      - name: Commit & push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet; then
+            echo "No changes — skipping commit"
+            exit 0
+          fi
+
+          git add infra/k8s/overlays/dev/kustomization.yaml
+          git commit -m "ci(deploy): bump dev images to ${{ steps.sha.outputs.tag }} [skip ci]"
+          git push
+
+      - name: Job summary
+        run: |
+          echo "## Dev Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "- Image tag: \`${{ steps.sha.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Run \`git pull && kubectl apply -k infra/k8s/overlays/dev\` locally" >> $GITHUB_STEP_SUMMARY
