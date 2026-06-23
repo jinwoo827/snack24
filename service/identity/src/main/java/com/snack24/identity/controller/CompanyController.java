@@ -23,6 +23,7 @@ public class CompanyController {
             @RequestBody @Valid CompanyRegisterRequest request
     ) {
         CompanyResponse response = companyService.register(request);
+        log.info("ci-test applied source");
         URI location = URI.create("/v1/companies/" + response.companyId());
         return ResponseEntity.created(location).body(response);
     }
