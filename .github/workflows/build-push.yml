@@ -19,8 +19,82 @@ env:
   IMAGE_NAMESPACE: ${{ github.repository_owner }}/snack24
 
 jobs:
+  detect-changes:
+    name: Detect changed services
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.set-matrix.outputs.services }}
+      any: ${{ steps.set-matrix.outputs.any }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0       # diff 계산을 위해 전체 히스토리
+
+      - name: Detect path changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            global:
+              - 'common/**'
+              - 'build.gradle'
+              - 'settings.gradle'
+              - 'gradle/**'
+              - 'gradle.properties'
+              - '.github/workflows/build-push.yml'
+            identity:
+              - 'service/identity/**'
+            catalog:
+              - 'service/catalog/**'
+            order:
+              - 'service/order/**'
+            billing:
+              - 'service/billing/**'
+            api-gateway:
+              - 'service/api-gateway/**'
+            notification-worker:
+              - 'service/notification-worker/**'
+
+      - name: Build dynamic matrix
+        id: set-matrix
+        run: |
+          # 모든 서비스
+          ALL='["identity","catalog","order","billing","api-gateway","notification-worker"]'
+          
+          # 수동 트리거 또는 global 변경 → 전체 빌드
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] \
+             || [ "${{ steps.filter.outputs.global }}" = "true" ]; then
+            echo "Trigger: full build"
+            echo "services=${ALL}" >> "$GITHUB_OUTPUT"
+            echo "any=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          
+          # 개별 서비스만 골라서 JSON 배열
+          CHANGED=()
+          for svc in identity catalog order billing api-gateway notification-worker; do
+            VAR_NAME="${svc//-/_}"   # api-gateway → api_gateway 로 변환 (변수명 규칙)
+            VAL=$(echo '${{ toJSON(steps.filter.outputs) }}' | jq -r --arg k "$svc" '.[$k] // "false"')
+            if [ "$VAL" = "true" ]; then
+              CHANGED+=("\"$svc\"")
+            fi
+          done
+          
+          if [ ${#CHANGED[@]} -eq 0 ]; then
+            echo "No service changed — skipping image build"
+            echo "services=[]" >> "$GITHUB_OUTPUT"
+            echo "any=false" >> "$GITHUB_OUTPUT"
+          else
+            IFS=,
+            echo "Changed services: ${CHANGED[*]}"
+            echo "services=[${CHANGED[*]}]" >> "$GITHUB_OUTPUT"
+            echo "any=true" >> "$GITHUB_OUTPUT"
+          fi
   build-jars:
     name: Build JARs
+    needs: detect-changes
+    if: needs.detect-changes.outputs.any == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -44,17 +118,23 @@ jobs:
           name: service-jars
           path: service/*/build/libs/app.jar
           retention-days: 1
+    run: |
+      SERVICES='${{ needs.detect-changes.outputs.services }}'
+      TASKS=$(echo "$SERVICES" | jq -r '.[]' | sed 's|^|:service:|;s|$|:bootJar|' | tr '\n' ' ')
+      echo "Running: ./gradlew $TASKS"
+      ./gradlew $TASKS --no-daemon
 
   build-push-images:
     name: Build & Push ${{ matrix.service }}
-    needs: build-jars
+    needs: [detect-changes, build-jars]
+    if: needs.detect-changes.outputs.any == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
     strategy:
       fail-fast: false
       matrix:
-        service: [ identity, catalog, order, billing, api-gateway, notification-worker ]
+        service: ${{ fromJSON(needs.detect-changes.outputs.services) }}
 
     steps:
       - uses: actions/checkout@v4
