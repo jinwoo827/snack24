@@ -110,7 +110,11 @@ jobs:
           cache-read-only: false
 
       - name: Build bootJar (all services)
-        run: ./gradlew bootJar --no-daemon
+        run: |
+          SERVICES='${{ needs.detect-changes.outputs.services }}'
+          TASKS=$(echo "$SERVICES" | jq -r '.[]' | sed 's|^|:service:|;s|$|:bootJar|' | tr '\n' ' ')
+          echo "Running: ./gradlew $TASKS"
+          ./gradlew $TASKS --no-daemon
 
       - name: Upload JAR artifacts
         uses: actions/upload-artifact@v4
@@ -118,11 +122,7 @@ jobs:
           name: service-jars
           path: service/*/build/libs/app.jar
           retention-days: 1
-    run: |
-      SERVICES='${{ needs.detect-changes.outputs.services }}'
-      TASKS=$(echo "$SERVICES" | jq -r '.[]' | sed 's|^|:service:|;s|$|:bootJar|' | tr '\n' ' ')
-      echo "Running: ./gradlew $TASKS"
-      ./gradlew $TASKS --no-daemon
+
 
   build-push-images:
     name: Build & Push ${{ matrix.service }}
