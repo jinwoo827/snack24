@@ -26,6 +26,7 @@ public class WalletController {
             @RequestBody @Valid WalletChargeRequest request
             ) {
         log.info("billing service modify test");
+        log.info("billing service modify test");
         return walletService.charge(caller.companyId(), request.amount(), request.idempotencyKey());
     }
 }
