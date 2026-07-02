@@ -7,4 +7,6 @@ dependencies {
     implementation project(':common:event')
     implementation project(':common:data-serializer')
 
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
 }

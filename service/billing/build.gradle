@@ -12,6 +12,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
     // QueryDSL — Boot 3 / Hibernate 6 호환 jakarta classifier
     implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'

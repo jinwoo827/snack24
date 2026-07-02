@@ -59,6 +59,10 @@ management:
     web:
       exposure:
         include: health,info,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      environment: ${SPRING_PROFILES_ACTIVE:default}
   endpoint:
     health:
       probes:
