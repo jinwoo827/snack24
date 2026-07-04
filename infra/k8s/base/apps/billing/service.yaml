@@ -5,5 +5,6 @@ metadata:
 spec:
   selector: { app: billing }
   ports:
-    - port: 8004
+    - name: http
+      port: 8004
       targetPort: 8004
