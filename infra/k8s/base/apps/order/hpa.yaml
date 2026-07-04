@@ -16,7 +16,7 @@ spec:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: 70      # requests.cpu(200m) 의 70% = 140m 초과 시 스케일 아웃
+          averageUtilization: 40
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 30

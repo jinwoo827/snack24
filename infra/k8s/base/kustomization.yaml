@@ -18,8 +18,10 @@ resources:
   - apps/identity/service.yaml
   - apps/catalog/deployment.yaml
   - apps/catalog/service.yaml
+  - apps/catalog/hpa.yaml
   - apps/order/deployment.yaml
   - apps/order/service.yaml
+  - apps/order/hpa.yaml
   - apps/billing/deployment.yaml
   - apps/billing/service.yaml
   - apps/notification-worker/deployment.yaml
