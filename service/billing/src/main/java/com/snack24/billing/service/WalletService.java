@@ -68,4 +68,9 @@ public class WalletService {
         return WalletChargeResponse.from(wallet);
     }
 
+    public WalletChargeResponse get(Long companyId) {
+        Wallet wallet = walletRepository.findByCompanyId(companyId)
+                .orElseThrow(() -> new BillingException(BillingErrorCode.WALLET_NOT_FOUND));
+        return WalletChargeResponse.from(wallet);
+    }
 }
