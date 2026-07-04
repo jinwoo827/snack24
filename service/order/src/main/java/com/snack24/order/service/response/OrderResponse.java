@@ -13,6 +13,7 @@ public record OrderResponse(
         Long companyId,
         Long memberId,
         OrderStatus status,
+        String cancelReason,
         BigDecimal totalAmount,
         List<OrderItemResponse> items,
         LocalDateTime createdAt
@@ -43,6 +44,7 @@ public record OrderResponse(
                 order.getCompanyId(),
                 order.getMemberId(),
                 order.getStatus(),
+                order.getCancelReason(),
                 order.getTotalAmount(),
                 order.getItems().stream().map(OrderItemResponse::from).toList(),
                 order.getCreatedAt()
