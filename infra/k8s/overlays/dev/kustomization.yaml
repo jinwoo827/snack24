@@ -12,22 +12,22 @@ commonLabels:
 images:
 - name: snack24/api-gateway
   newName: ghcr.io/jinwoo827/snack24/api-gateway
-  newTag: 6717ece
+  newTag: 972f8cb
 - name: snack24/billing
   newName: ghcr.io/jinwoo827/snack24/billing
-  newTag: 6717ece
+  newTag: 972f8cb
 - name: snack24/catalog
   newName: ghcr.io/jinwoo827/snack24/catalog
-  newTag: 6717ece
+  newTag: 972f8cb
 - name: snack24/identity
   newName: ghcr.io/jinwoo827/snack24/identity
-  newTag: 6717ece
+  newTag: 972f8cb
 - name: snack24/notification-worker
   newName: ghcr.io/jinwoo827/snack24/notification-worker
-  newTag: 6717ece
+  newTag: 972f8cb
 - name: snack24/order
   newName: ghcr.io/jinwoo827/snack24/order
-  newTag: 6717ece
+  newTag: 972f8cb
 
 patches:
 - path: replicas-patch.yaml
