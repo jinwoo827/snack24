@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: snack24-services
+  namespace: monitoring
+  labels:
+    release: prometheus
+spec:
+  namespaceSelector:
+    matchNames: [snack24]
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: snack24
+  endpoints:
+    - port: http
+      path: /actuator/prometheus
+      interval: 15s
+      scrapeTimeout: 10s
+      metricRelabelings:
+        - action: drop
+          sourceLabels: [__name__]
+          regex: 'jvm_buffer_(count|memory)_used'
